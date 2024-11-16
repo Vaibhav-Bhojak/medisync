@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medi-Sync Landing Page</title>
+    <link rel="stylesheet" href="stylesheet/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/space-grotesk" rel="stylesheet">
+</head>
+<style>
+    @import url('https://fonts.cdnfonts.com/css/space-grotesk');
+
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+        background: white;
+        overflow-x: hidden;
+    }
+
+
+    .glass-nav {
+        position: relative;
+        /* Set to fixed or absolute to capture the background */
+
+        background: rgba(255, 255, 255, 0.3);
+        /* Semi-transparent background */
+        backdrop-filter: blur(10px);
+        /* Blur effect */
+        border-radius: 10px;
+        /* Rounded corners */
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        /* Optional: border for depth */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        /* Optional: shadow for depth */
+        z-index: 50;
+        /* Ensure it stays above other elements */
+        max-width: 90%;
+        /* Set the maximum width to 90% */
+        margin: auto;
+        /* Center the navigation bar */
+        background: rgba(255, 255, 255, 0.3);
+        /* Semi-transparent background */
+        backdrop-filter: blur(10px);
+        /* Blur effect */
+        border-radius: 10px;
+        /* Rounded corners */
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        /* Optional: border for depth */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        /* Optional: shadow for depth */
+        margin-top: 50px;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(0, 0, 0, 0.05);
+        border-radius: 1rem;
+        -webkit-border-radius: 1rem;
+        -moz-border-radius: 1rem;
+        -ms-border-radius: 1rem;
+        -o-border-radius: 1rem;
+    }
+
+    .merq {
+        margin-left: 1rem;
+        margin-right: 1rem;
+        font-size: 5rem;
+        display: flex;
+        flex-direction: row;
+    }
+
+
+    .circle {
+        border-radius: 50%;
+        position: absolute;
+        opacity: 0;
+        transform: scale(0);
+        background: linear-gradient(145deg, rgba(249, 250, 251, 0.9), rgba(243, 244, 246, 0.4));
+        box-shadow:
+            inset -2px -2px 6px rgba(255, 255, 255, 0.8),
+            inset 2px 2px 6px rgba(0, 0, 255, 0.2);
+        border: 1px solid rgba(243, 244, 246, 0.8);
+        z-index: 1;
+    }
+
+    .circle::after {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        right: -1px;
+        bottom: -1px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, transparent, rgba(243, 244, 246, 0.3));
+        pointer-events: none;
+    }
+
+    .circle-label {
+        position: absolute;
+        font-size: 0.875rem;
+        color: #6B7280;
+        white-space: pre-line;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: white;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        opacity: 0;
+        z-index: 2;
+    }
+
+    .circle-label::before {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #818CF8;
+        border-radius: 50%;
+        left: -12px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dna-bg {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        background: url('/api/placeholder/800/1200') no-repeat right center;
+        background-size: contain;
+        opacity: 0.8;
+        z-index: -1;
+    }
+
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: bold;
+    }
+
+    .mission-text {
+        font-size: 2.5rem;
+        line-height: 1.2;
+    }
+
+    .light-text {
+        color: #B0B0B0;
+    }
+
+    .section {
+        min-height: 100vh;
+        position: relative;
+    }
+
+    #circles-container {
+        transform-origin: center;
+        perspective: 1000px;
+    }
+
+    #dna-container {
+        position: absolute;
+        top: 0;
+        right: -500px;
+        width: 100%;
+        height: 100vh;
+    }
+
+    @media (max-width: 640px) {
+
+        /* This targets screens that are small (like mobile devices) */
+        #dna-container {
+            display: none;
+            /* Hides the #dna-container */
+        }
+    }
+
+    .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-family: Arial, sans-serif;
+    }
+
+    /* From Uiverse.io by cssbuttons-io */
+    .fancy {
+        background-color: transparent;
+        border: 2px solid #000;
+        border-radius: 0;
+        box-sizing: border-box;
+        color: #fff;
+        cursor: pointer;
+        display: inline-block;
+
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin: 0;
+        outline: none;
+        overflow: visible;
+        padding: 1.25em 2em;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        text-transform: none;
+        transition: all 0.3s ease-in-out;
+        user-select: none;
+        font-size: 13px;
+    }
+
+    .fancy::before {
+        content: " ";
+        width: 1.5625rem;
+        height: 2px;
+        background: black;
+        top: 50%;
+        left: 1.5em;
+        position: absolute;
+        transform: translateY(-50%);
+        transform-origin: center;
+        transition: background 0.3s linear, width 0.3s linear;
+    }
+
+    .fancy .text {
+        font-size: 1.125em;
+        line-height: 1.33333em;
+        padding-left: 2em;
+        display: block;
+        text-align: left;
+        transition: all 0.3s ease-in-out;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: black;
+    }
+
+    .fancy .top-key {
+        height: 2px;
+        width: 1.5625rem;
+        top: -2px;
+        left: 0.625rem;
+        position: absolute;
+        background: #e8e8e8;
+        transition: width 0.5s ease-out, left 0.3s ease-out;
+    }
+
+    .fancy .bottom-key-1 {
+        height: 2px;
+        width: 1.5625rem;
+        right: 1.875rem;
+        bottom: -2px;
+        position: absolute;
+        background: #e8e8e8;
+        transition: width 0.5s ease-out, right 0.3s ease-out;
+    }
+
+    .fancy .bottom-key-2 {
+        height: 2px;
+        width: 0.625rem;
+        right: 0.625rem;
+        bottom: -2px;
+        position: absolute;
+        background: #e8e8e8;
+        transition: width 0.5s ease-out, right 0.3s ease-out;
+    }
+
+    .fancy:hover {
+        color: white;
+        background: black;
+    }
+
+    .fancy:hover::before {
+        width: 0.9375rem;
+        background: white;
+    }
+
+    .fancy:hover .text {
+        color: white;
+        padding-left: 1.5em;
+    }
+
+    .fancy:hover .top-key {
+        left: -2px;
+        width: 0px;
+    }
+
+    .fancy:hover .bottom-key-1,
+    .fancy:hover .bottom-key-2 {
+        right: 0;
+        width: 0;
+    }
+
+
+    .advantage-card {
+        background: #f8f9fa;
+        border-radius: 24px;
+        transition: transform 0.3s ease;
+    }
+
+    .advantage-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .explore-btn {
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .explore-btn:hover {
+        background: #000;
+        color: white;
+    }
+
+    .timeline-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .timeline-line {
+        flex: 1;
+        height: 2px;
+        background-color: #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .timeline-text {
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover .timeline-dot,
+    .timeline-item.active .timeline-dot {
+        background-color: #818cf8;
+    }
+
+    .timeline-item:hover .timeline-text,
+    .timeline-item.active .timeline-text {
+        opacity: 1;
+    }
+</style>
+
+<body>
+    <nav class=" glass-nav  z-50 mt-10 px-5 w-full">
+        <div class="container mx-auto px-6 py-1">
+            <div class="flex justify-between items-center">
+                <a href="./"><img src="img/image-removebg-preview.png" alt="Medi-Sync Logo" class="h-16"></a>
+                <div class="flex items-center gap-4">
+                    <button id="menuButton"
+                        class="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" aria-label="Menu"
+                        aria-expanded="false">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" class="transform transition-transform duration-200">
+                            <line x1="4" y1="6" x2="20" y2="6"></line>
+                            <line x1="4" y1="12" x2="20" y2="12"></line>
+                            <line x1="4" y1="18" x2="20" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="dropdown" style="z-index: 500;"
+        class="absolute right-14 mt-2 w-64 bg-white rounded-lg shadow-lg hidden dropdown-transition dropdown-enter"
+        role="menu">
+        <!-- Search Bar Section -->
+        <div class="p-4 border-b border-gray-200">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search..."
+                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-purple-500">
+                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="py-2">
+            <div id="menuItems">
+                <a href="./register.html"
+                    class="menu-item block px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors">
+                    <span class="font-medium">Login</span>
+                    <span class="block text-sm text-gray-500">Accesss Your Account</span>
+                </a>
+                <a href="./blog1.html"
+                    class="menu-item block px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors">
+                    <span class="font-medium">Blogs</span>
+                    <span class="block text-sm text-gray-500">Read latest Articles</span>
+                </a>
+                <a href="./institutions.html"
+                    class="menu-item block px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors">
+                    <span class="font-medium">Partners</span>
+                    <span class="block text-sm text-gray-500">View Partners & Institutions</span>
+                </a>
+            </div>
+            <!-- No Results Message -->
+            <div id="noResults" class="hidden px-4 py-3 text-gray-500 text-center">
+                No matching results
+            </div>
+        </nav>
+    </div>
+
+    <div id="dna-container"></div>
+
+    <!-- First Section -->
+    <section class="section px-0 sm:px-20">
+
+
+        <main class="container mx-auto px-6 pt-20 pb-12 relative ">
+            <div class="max-w-2xl">
+                <p class="text-gray-600 mb-4 uppercase tracking-wide">OUR MISSION</p>
+                <h1 class="text-4xl font-bold mb-6 leading-tight">Seamless Access, Superior Care</h1>
+                <p class="text-gray-700 mb-8 text-lg">With Medi-Sync, accessing comprehensive health records becomes
+                    effortless, leading to improved clinical decision-making, better patient outcomes, and a more
+                    efficient healthcare system overall.</p>
+
+                <a class="fancy" href="#">
+                    <span class="top-key"></span>
+                    <span class="text">Register Institution</span>
+                    <span class="bottom-key-1"></span>
+                    <span class="bottom-key-2"></span>
+                </a>
+
+
+
+            </div>
+
+            <div class="mt-32">
+                <div class="glass p-8 ">
+                    <div class="flex items-start gap-8">
+                        <div class="text-4xl font-bold "><img src="./img/india.png" lt=""></div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-2">
+                                National Health Authority</div>
+                            <h2 class="text-2xl font-bold mb-4">Ayushman Bharat Digital Mission</h2>
+                            <p class="text-gray-700">India's medical infrastructure is highly fragmented, hindering
+                                efficient patient care. Medi-Sync in collaboration with <B>NHM</B> aims to centralize
+                                healthcare data, mitigating these challenges. It aims to develop the backbone necessary
+                                to
+                                support the integrated digital health infrastructure of the country. It will bridge the
+                                existing gap amongst different stakeholders of Healthcare ecosystem through digital
+                                highways.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </section>
+
+    <div class="merq pb-10">
+        <marquee direction="left" scrollamount="20">
+            <span>CENTRALISED DATA MANAGEMENT <sup>🇮🇳</sup>/</span>
+            <span> EMPOWERING HEALTHCARE INFRASTRUCTURE <sup>🇮🇳</sup>/</span>
+            <span> ENHANCED DATA ACCESSIBLITY <sup>🇮🇳</sup>/</span>
+            <span> PREVENTING DATA FRAGMENTATION <sup>🇮🇳</sup></span>
+        </marquee>
+    </div>
+
+    <div class="p-2 sm:p-20 mx-auto">
+        <h1 class="text-6xl font-bold mb-16">The Science Behind<br>Our Services</h1>
+
+        <div class="mb-16">
+            <p class="text-2xl">
+                <span class="font-bold">Pioneering</span>
+                <span class="text-gray-400">healthcare innovation</span>, we
+                leverage cutting-edge technologies, from
+                <span class="text-gray-400">Data Retrieval to AI-driven analysis.</span>
+            </p>
+        </div>
+        <div class="relative">
+            <div class="flex items-center gap-2 mb-8">
+                <div class="timeline-item cursor-pointer active" data-index="0">
+                    <div class="timeline-dot"></div>
+                    <p class="timeline-text text-sm absolute mt-8 max-w-[200px]">
+                        Providing a unified platform for organizing patient records across healthcare providers.
+                    </p>
+                </div>
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item cursor-pointer" data-index="1">
+                    <div class="timeline-dot"></div>
+                    <p class="timeline-text text-sm absolute mt-8 max-w-[200px]">
+                        Supporting government by providing medical insights to prevent emergencies. </p>
+                </div>
+                <div class="timeline-line"></div>
+                <div class="timeline-item cursor-pointer" data-index="2">
+                    <div class="timeline-dot"></div>
+                    <p class="timeline-text text-sm absolute mt-8 max-w-[200px]">
+                        Enhancing accessibility to critical health records for both patients and healthcare providers.
+                    </p>
+                </div>
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item cursor-pointer" data-index="3">
+                    <div class="timeline-dot"></div>
+                    <p class="timeline-text text-sm absolute mt-8 max-w-[200px]">
+                        Empowers Indian health infrastructure for efficient healthcare coordination.
+                    </p>
+                </div>
+                <div class="timeline-line"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <section class="section p-2 sm:p-20 bg-white">
+        <main class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-16">
+                    <div>
+                        <h1 class="mission-text mb-6">
+                            <b>The Life-Saving Impact<br></b>
+                            <span class="light-text"> of consolidating Medical Reports</span>
+                        </h1>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="stat-number">0</div>
+                            <div class="text-gray-600">States</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">0</div>
+                            <div class="text-gray-600">Healthcare Providers</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">0</div>
+                            <div class="text-gray-600">Medical Institutions</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">0</div>
+                            <div class="text-gray-600">Lives Saved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative h-[600px]" id="circles-container">
+                    <!-- Circles will be added dynamically -->
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section class=" bg-white pt-0 p-2 sm:p-20">
+        <header class="mb-24">
+            <p class="text-sm mb-4">Your Health, Our Expertise</p>
+            <h1 class="text-7xl font-bold">Progress Path</h1>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="advantage-card p-8">
+                <div class="flex justify-between items-start mb-8">
+                    <span class="px-4 py-1 rounded-full border border-gray-200 text-sm">Government</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl mb-4">MediSync Integration and API Implementation</h2>
+                <div class="flex justify-between items-end">
+                    <span class="text-6xl font-light">01</span>
+                    <a href="./blog1.html"><button class="explore-btn">explore</button></a>
+                </div>
+            </div>
+
+            <div class="advantage-card p-8">
+                <div class="flex justify-between items-start mb-8">
+                    <span class="px-4 py-1 rounded-full border border-gray-200 text-sm">Private Hospitals</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl mb-4">Checkout Partnered Institutions</h2>
+                <div class="flex justify-between items-end">
+                    <span class="text-6xl font-light">02</span>
+                    <a href="./institutions.html"><button class="explore-btn">explore</button></a>
+                </div>
+            </div>
+
+            <div class="advantage-card p-8">
+                <div class="flex justify-between items-start mb-8">
+                    <span class="px-4 py-1 rounded-full border border-gray-200 text-sm">Platform Integration</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl mb-4">API and Support Documentation</h2>
+                <div class="flex justify-between items-end">
+                    <span class="text-6xl font-light">03</span>
+                    <a href="./register.html"><button class="explore-btn">explore</button></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="bg-gray-50 border-t border-gray-100 mt-10">
+        <div class="max-w-7xl mx-auto px-8 py-16">
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <!-- Logo and Description -->
+                <div class="col-span-1 md:col-span-2">
+                    <h2 class="text-xl font-bold mb-4">Medi-Sync</h2>
+                    <p class="text-gray-500 mb-6 max-w-md">
+                        Enhancing accessibility to critical health records for both patients and healthcare providers.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase mb-4">Services</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-500 hover:text-gray-600">Data Analysis</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-600">Health Screening</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-600">Survey</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-600">Research</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase mb-4">Contact</h3>
+                    <ul class="space-y-3">
+                        <li class="text-gray-500">Macheda, Rajasthan</li>
+                        <li class="text-gray-500">India 302013</li>
+                        <li><a href="tel:+11234567890" class="text-gray-500 hover:text-gray-600">+91 935194469</a>
+                        </li>
+                        <li><a href="mailto:info@Medi-Sync.com"
+                                class="text-gray-500 hover:text-gray-600">info@Medi-Sync.com</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-100 mt-12 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-400 text-sm">© 2024 Medi-Sync. All rights reserved.</p>
+                    <div class="flex gap-6">
+                        <a href="#" class="text-gray-400 hover:text-gray-600 text-sm">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-gray-600 text-sm">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-gray-600 text-sm">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        const timelineItems = document.querySelectorAll('.timeline-item');
+
+        timelineItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                timelineItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.classList.remove('active');
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const counters = document.querySelectorAll('.stat-number');
+
+            const counterValues = [
+                { start: 0, end: 14, duration: 2000 },
+                { start: 0, end: 42, duration: 2000 },
+                { start: 0, end: 560, duration: 2000 },
+                { start: 0, end: 26000, duration: 2000 },
+            ];
+
+            const animateCounter = (counter, end, duration) => {
+                let start = 0;
+                const increment = end / (duration / 100); // Calculate increment based on duration
+
+                const interval = setInterval(() => {
+                    start += increment;
+                    if (start >= end) {
+                        start = end;
+                        clearInterval(interval);
+                    }
+                    counter.innerText = Math.floor(start) + '+';
+                    counter.style.animation = 'countdown 0.5s ease-in-out'; // Trigger animation
+                }, 100);
+            };
+
+            const handleIntersection = (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const index = Array.from(counters).indexOf(entry.target);
+                        const { end, duration } = counterValues[index];
+                        animateCounter(entry.target, end, duration);
+                        observer.unobserve(entry.target); // Stop observing once animated
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(handleIntersection, { threshold: 0.1 });
+
+            counters.forEach(counter => {
+                observer.observe(counter); // Start observing each counter
+            });
+        });
+
+
+        const circlesData = [
+            { size: 480, label: 'Fragmented Patient\n Records ?', x: 20, y: -5 },
+            { size: 420, label: 'Ineffecient Care\n Coordination ?', x: 75, y: 1 },
+            { size: 360, label: 'Lacking  Data\n Accessibility ?', x: 55, y: 70 },
+            { size: 300, label: 'Hassle Managing Reports ?', x: 90, y: 55 },
+            { size: 240, label: 'Readability Issues ?', x: 10, y: 65 }
+        ];
+
+        function createCircles() {
+            const container = document.getElementById('circles-container');
+
+            circlesData.forEach((circle, index) => {
+                const div = document.createElement('div');
+                div.className = 'circle';
+                div.style.width = `${circle.size}px`;
+                div.style.height = `${circle.size}px`;
+                div.style.left = `${circle.x}%`;
+                div.style.top = `${circle.y}%`;
+
+                const label = document.createElement('div');
+                label.className = 'circle-label';
+                label.textContent = circle.label;
+                label.style.left = '0';
+                label.style.top = '50%';
+
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+
+            // Animate circles when they come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCircles();
+                        observer.disconnect();
+                    }
+                });
+            });
+
+            observer.observe(container);
+        }
+
+        function animateCircles() {
+            const tl = gsap.timeline({
+                defaults: {
+                    ease: "power2.out"
+                }
+            });
+
+            gsap.utils.toArray('.circle').forEach((circle, i) => {
+                const label = circle.querySelector('.circle-label');
+
+                tl.fromTo(circle,
+                    {
+                        opacity: 0,
+                        scale: 0,
+                        rotation: -180,
+                        transformOrigin: "center center"
+                    },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 1.2,
+                        ease: "elastic.out(1, 0.7)"
+                    },
+                    i * 0.2
+                )
+                    .fromTo(label,
+                        {
+                            opacity: 0,
+                            x: -20
+                        },
+                        {
+                            opacity: 1,
+                            x: 0,
+                            duration: 0.6
+                        },
+                        i * 0.2 + 0.3
+                    );
+            });
+
+            // Hover animations
+            gsap.utils.toArray('.circle').forEach(circle => {
+                circle.addEventListener('mouseenter', () => {
+                    gsap.to(circle, {
+                        scale: 1.05,
+                        duration: 0.3
+                    });
+                });
+
+                circle.addEventListener('mouseleave', () => {
+                    gsap.to(circle, {
+                        scale: 1,
+                        duration: 0.3
+                    });
+                });
+            });
+        }
+
+        // Initialize
+        window.addEventListener('load', createCircles);
+
+        //DNA
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        document.getElementById('dna-container').appendChild(renderer.domElement);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xff00ff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        const pointLight2 = new THREE.PointLight(0x00ffff, 1);
+        pointLight2.position.set(-10, -10, -10);
+        scene.add(pointLight2);
+
+        // DNA Group
+        const dna = new THREE.Group();
+        dna.rotation.z = -0.5; // Tilt DNA slightly to the right
+        scene.add(dna);
+        function createGradientTexture() {
+            const canvas = document.createElement('canvas');
+            const size = 512; // Size of the gradient texture
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, size);
+            gradient.addColorStop(0, 'rgb(168, 47, 255)'); // Purple
+            gradient.addColorStop(1, 'rgba(255, 0, 255, 1)'); // Magenta
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Gradient material (creating a gradient on the DNA)
+        const gradientMaterial = new THREE.MeshPhysicalMaterial({
+            vertexColors: true, // Enable vertex colors for gradient
+            metalness: 0.9,
+            roughness: 0.1,
+            transparent: true,
+            opacity: 0.8,
+            emissive: 0x330033
+        });
+
+        // Create DNA structure without central connection
+        const sphereGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+
+        const createHelix = () => {
+            const numPoints = 50;
+            const radius = 3;
+            const height = 17;
+
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 3;
+                const y = (i / numPoints) * height - height / 2;
+
+                // First strand
+                const sphere1 = new THREE.Mesh(sphereGeometry, gradientMaterial.clone());
+                sphere1.position.set(
+                    Math.cos(angle) * radius,
+                    y,
+                    Math.sin(angle) * radius
+                );
+
+                // Second strand
+                const sphere2 = new THREE.Mesh(sphereGeometry, gradientMaterial.clone());
+                sphere2.position.set(
+                    Math.cos(angle + Math.PI) * radius,
+                    y,
+                    Math.sin(angle + Math.PI) * radius
+                );
+
+                dna.add(sphere1);
+                dna.add(sphere2);
+            }
+        };
+
+        createHelix();
+
+        // Particle system
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 1000;
+        const posArray = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 20;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.07,
+            color: 0x800080,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // Camera position
+        camera.position.z = 15;
+
+        // Mouse interaction
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - window.innerWidth / 2) / 100;
+            mouseY = (event.clientY - window.innerHeight / 2) / 100;
+        });
+
+        // Animation
+        let time = 0;
+        const animate = () => {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rotate DNA
+            dna.rotation.y += 0.005;
+
+            // Smooth camera movement based on mouse
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            // Animate particles
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.position.y = Math.sin(time) * 0.2;
+
+            // Animate lights
+            pointLight.position.x = Math.sin(time) * 15;
+            pointLight.position.z = Math.cos(time) * 15;
+            pointLight2.position.x = Math.sin(time + Math.PI) * 15;
+            pointLight2.position.z = Math.cos(time + Math.PI) * 15;
+
+            renderer.render(scene, camera);
+        };
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start animation
+        animate();
+
+        // Add some dynamic animations with GSAP
+        gsap.to(dna.scale, {
+            x: 1.2,
+            y: 1.2,
+            z: 1.2,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut"
+        });
+
+        gsap.to(dna.rotation, {
+            x: Math.PI * 0.1,
+            duration: 4,
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut"
+        });
+
+
+    </script>
+    <script>
+        // Elements
+        const menuButton = document.getElementById('menuButton');
+        const dropdown = document.getElementById('dropdown');
+        const searchInput = document.getElementById('searchInput');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const noResults = document.getElementById('noResults');
+
+        // Toggle dropdown with animation
+        function toggleDropdown() {
+            const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+
+            if (!isExpanded) {
+                // Show dropdown
+                dropdown.classList.remove('hidden');
+                // Trigger reflow
+                dropdown.offsetHeight;
+                dropdown.classList.remove('dropdown-enter');
+                dropdown.classList.add('dropdown-enter-active');
+                menuButton.setAttribute('aria-expanded', 'true');
+                // Focus search input
+                searchInput.focus();
+            } else {
+                // Hide dropdown
+                dropdown.classList.remove('dropdown-enter-active');
+                dropdown.classList.add('dropdown-enter');
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                    // Clear search
+                    searchInput.value = '';
+                    filterMenuItems('');
+                }, 150);
+                menuButton.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        // Filter menu items based on search input
+        function filterMenuItems(searchTerm) {
+            let hasVisibleItems = false;
+
+            menuItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm.toLowerCase())) {
+                    item.classList.remove('hidden');
+                    hasVisibleItems = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Toggle no results message
+            noResults.classList.toggle('hidden', hasVisibleItems);
+        }
+
+        // Event Listeners
+        menuButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            filterMenuItems(e.target.value);
+        });
+
+        // Handle keyboard navigation
+        dropdown.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                toggleDropdown();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && !menuButton.contains(e.target)) {
+                if (!dropdown.classList.contains('hidden')) {
+                    toggleDropdown();
+                }
+            }
+        });
+
+        // Prevent clicks inside dropdown from closing it
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle focus trap
+        const focusableElements = dropdown.querySelectorAll(
+            'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+        );
+
+        if (focusableElements.length > 0) {
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+
+            dropdown.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey && document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
